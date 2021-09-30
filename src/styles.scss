@@ -1,0 +1,99 @@
+//variables
+
+// used colors:
+@import "./scss/globals";
+@import "./scss/mixin";
+
+// Start Utility classes
+
+.modal--button {
+  @include center-content-x;
+  color: $white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  &:first-letter {
+    text-transform: capitalize;
+  }
+}
+
+.notify--button {
+  @include center-content-x;
+  background-color: #10c96c;
+  color: $white;
+  font-size: 1.25rem;
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  min-height: 50px;
+}
+
+.modal-overlay {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  padding: 2rem;
+  width: 450px;
+  background: $white;
+  border-radius: 20px;
+  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.17);
+  &--title {
+    color: $primary-color;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  &--tabs {
+    display: flex;
+    width: 100%;
+    &__button {
+      flex: 1;
+      min-height: 40px;
+      @include center-content-x;
+      padding: 0.65rem 1rem;
+      color: $primary-color;
+      font-size: 1rem;
+      font-weight: 400;
+      background: $light-grey;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      &.active {
+        color: $white;
+        background: $primary-color;
+      }
+    }
+  }
+  &--tab {
+    width: 100%;
+    &__input {
+      display: inline-block;
+      width: 100%;
+      border: 2px solid #c4c4c4;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: $primary-color;
+      &::placeholder {
+        font-size: 1.125rem;
+        font-weight: 300;
+        color: #d5d5d5;
+      }
+    }
+  }
+}
