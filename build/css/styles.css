@@ -22,10 +22,12 @@
   justify-content: center;
   align-items: center;
   color: #ffffff;
-  min-height: 50px;
   border: none;
   outline: none;
   cursor: pointer;
+}
+.modal--button:first-letter {
+  text-transform: capitalize;
 }
 
 .notify--button {

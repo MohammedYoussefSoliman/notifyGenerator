@@ -1,45 +1,64 @@
-import {
-  FontSizeProperty,
-  ColorProperty,
-  BackgroundProperty,
-  FontWeightProperty,
-  WidthProperty,
-  HeightProperty,
-  BorderWidthProperty,
-  BorderRadiusProperty,
-} from "./cssTypes";
+import { ColorProperty } from "./cssTypes";
 
 export interface ButtonOptionsType {
-  type?: "button" | "anchor";
-  text?: {
-    value: string;
-    color?: ColorProperty;
-    size?: FontSizeProperty<number | string>;
-    weight?: FontWeightProperty;
-  };
-  background?: BackgroundProperty<number | string>;
-  width?: WidthProperty<number | string>;
-  height?: HeightProperty<number | string>;
-  border?: {
-    width?: BorderWidthProperty<number | string>;
-    color?: ColorProperty;
-    radius?: BorderRadiusProperty<number | string>;
+  text?: string;
+  styles?: Partial<CSSStyleDeclaration>;
+  selectors?: {
+    classes?: string[];
+    id?: string;
   };
 }
 
-export interface ModalOptionsType {
-  title?: {
-    text: string;
-    color?: ColorProperty;
-    size?: FontSizeProperty<number | string>;
-    weight?: FontWeightProperty;
-  } | null;
-  tabs?: {
-    color?: ColorProperty;
-    background?: ColorProperty;
-    activeColor?: ColorProperty;
-    activeBackground?: ColorProperty;
+export type ElementType = {
+  value: string | number;
+  name?: string;
+  tag: string;
+  elementStyles?: Partial<CSSStyleDeclaration>;
+  type?: string;
+  classes?: string[];
+  id?: string;
+};
+
+type ContentType = {
+  istabs: false;
+  element: ElementType[];
+};
+
+type TabsConfigs = {
+  istabs: true;
+  tabs: {
+    header: string;
+    panel?: ElementType[] | ElementType;
+  }[];
+  tabsStyles?: {
+    active: Partial<CSSStyleDeclaration>;
+    inactive: Partial<CSSStyleDeclaration>;
   };
-  Button?: ButtonOptionsType;
+};
+
+type ModalHeader = {
+  title?: ElementType;
+  closelButton?: ButtonOptionsType;
+  titleStyles?: Partial<CSSStyleDeclaration>;
+  withClose?: boolean;
+};
+
+type ModalFooter = {
+  content?: ElementType;
+  withClose?: boolean;
+  closelButton?: ButtonOptionsType;
+  button?: ButtonOptionsType;
+  styles?: Partial<CSSStyleDeclaration>;
+};
+
+export interface ModalOptionsType {
+  modalHeader?: ModalHeader;
+  modalBody?: TabsConfigs | ContentType;
+  modalFooter?: ModalFooter;
+  isFormModal?: boolean;
   size?: "sm" | "md" | "lg";
+  selectors?: {
+    classes?: string[];
+    id?: string;
+  };
 }

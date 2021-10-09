@@ -1,6 +1,6 @@
 import Is from "@flk/supportive-is";
 
-export const configResolver = <T>(options: T, configs: T) => {
+const configResolver = <T>(options: T, configs: T) => {
   if (Is.object(options)) {
     let updatedOptions = {
       ...configs,
@@ -33,3 +33,5 @@ export const configResolver = <T>(options: T, configs: T) => {
     return configs;
   }
 };
+
+export default configResolver;

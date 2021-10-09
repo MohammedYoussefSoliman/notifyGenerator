@@ -1,5 +1,6 @@
 import { ButtonOptionsType } from "./types/interfaces";
-import { configResolver } from "./configResolver";
+import { elementStyler, configResolver } from "./functions";
+import Is from "@flk/supportive-is";
 
 export default class Button {
   constructor(options: ButtonOptionsType | null) {
@@ -11,47 +12,28 @@ export default class Button {
     }
   }
   private configOptions: ButtonOptionsType = {
-    type: "button",
-    text: {
-      value: "Notify me",
+    text: "Notify me",
+    styles: {
       color: "#ffffff",
-      size: "1.5rem",
-      weight: "normal",
-    },
-
-    background: "#0e1311",
-    width: "100%",
-    height: "50px",
-    border: {
-      width: 0,
+      fontSize: "1.5rem",
+      fontWeight: "normal",
+      background: "#0e1311",
+      width: "100%",
+      height: "50px",
     },
   };
 
   private generateButton() {
     const { configOptions } = this;
-    const button = document.createElement("button");
+    const button = elementStyler("button")(configOptions.styles!);
     button.setAttribute("type", "button");
-    button.className = "modal--button";
-    button.id = "modalButton";
-    button.innerText = configOptions["text"]!.value;
-    // styling the button
-    button.style.color = configOptions["text"]!.color as string;
-    button.style.fontSize = configOptions["text"]!.size as string;
-    button.style.fontWeight = configOptions["text"]!.weight as string;
-    button.style.backgroundColor = configOptions.background as string;
-    button.style.width = configOptions.width as string;
-    button.style.height = configOptions.height as string;
-    if (configOptions.border) {
-      if (configOptions.border.width) {
-        button.style.borderWidth = configOptions.border.width as string;
-      }
-      if (configOptions.border.color) {
-        button.style.borderColor = configOptions.border.color as string;
-      }
-      if (configOptions.border.radius) {
-        button.style.borderRadius = configOptions.border.radius as string;
-      }
+    if (configOptions.selectors && !Is.empty(configOptions.selectors)) {
+      const { classes, id } = configOptions.selectors;
+      if (classes) button.className = classes.join(" ");
+      if (id) button.id = id;
     }
+    button.innerText = configOptions["text"] as string;
+
     return button;
   }
 
