@@ -49,40 +49,69 @@
   gap: 21px;
   // padding: 2rem;
   width: 450px;
-  &.small--size {
+  min-height: 50vh;
+  &.sm {
     width: 450px;
+    .modal--header {
+      padding: 1rem;
+    }
   }
-  &.middle--size {
+  &.md {
     width: 70%;
-    min-height: 50vh;
   }
-  &.small--size {
+  &.lg {
     width: 90%;
-    min-height: 50vh;
   }
   background: $white;
   border-radius: 20px;
   box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.17);
   &--header {
-    width: 100%;
     display: flex;
+    align-items: center;
+    gap: 2rem;
     padding: 32px;
     border-bottom: 1px solid #ddd;
     &__title {
       font-size: 1.5rem;
       font-weight: 600;
       color: #2a2a2a;
+      flex: 1;
+    }
+    &__close__button {
+      @include center-content-x;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      margin-left: auto;
+      border: none;
+      background: #ebebeb;
+      order: 2;
+      cursor: pointer;
+      img {
+        width: 12px;
+        height: 12px;
+        object-fit: contain;
+      }
     }
   }
   &--body {
-    width: 100%;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
     flex: 1;
+  }
+  &--footer {
+    border-top: 1px solid #ddd;
+    padding: 2rem;
+    &__button__groups {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: space-between;
+    }
   }
   &--tabs {
     display: flex;
-    width: 100%;
     &__button {
       flex: 1;
       min-height: 40px;
@@ -102,10 +131,8 @@
     }
   }
   &--tab {
-    width: 100%;
     &__input {
       display: inline-block;
-      width: 100%;
       border: 2px solid #c4c4c4;
       border-radius: 8px;
       padding: 1rem;

@@ -1,19 +1,26 @@
-import { ModalOptionsType, ElementType } from "./types/interfaces";
+import {
+  ModalOptionsType,
+  ButtonOptionsType,
+  ElementType,
+  ContentType,
+} from "./types/interfaces";
 import { configResolver, elementStyler } from "./functions";
+import { closeIcon } from "./assets/index";
 import Button from "./Button";
 import Is from "@flk/supportive-is";
 
 export default class Modal {
-  constructor(options: ModalOptionsType | null) {
-    if (options) {
-      this.configOptions = configResolver<ModalOptionsType>(
-        options,
-        this.configOptions
-      );
-    }
+  constructor(options: ModalOptionsType) {
+    this.configOptions = configResolver<ModalOptionsType>(
+      options,
+      this.configOptions
+    );
   }
 
   private configOptions: ModalOptionsType = {
+    id: "default_modal",
+    escClose: false,
+    backdropClose: false,
     modalHeader: {
       title: {
         value: "notify me",
@@ -30,31 +37,35 @@ export default class Modal {
       tabs: [
         {
           header: "email",
-          panel: {
-            name: "email",
-            tag: "input",
-            type: "email",
-            value: "",
-            elementStyles: {
-              padding: "1rem",
-              border: "1px solid #00f6",
-              borderRadius: "5px",
+          panelElements: [
+            {
+              name: "email",
+              tag: "input",
+              type: "email",
+              value: "",
+              elementStyles: {
+                padding: "1rem",
+                border: "1px solid #00f6",
+                borderRadius: "5px",
+              },
             },
-          },
+          ],
         },
         {
           header: "sms",
-          panel: {
-            name: "sms",
-            tag: "input",
-            type: "text",
-            value: "",
-            elementStyles: {
-              padding: "1rem",
-              border: "1px solid #00f6",
-              borderRadius: "5px",
+          panelElements: [
+            {
+              name: "sms",
+              tag: "input",
+              type: "text",
+              value: "",
+              elementStyles: {
+                padding: "1rem",
+                border: "1px solid #00f6",
+                borderRadius: "5px",
+              },
             },
-          },
+          ],
         },
       ],
       tabsStyles: {
@@ -63,7 +74,7 @@ export default class Modal {
           background: "#00ff79",
         },
         inactive: {
-          color: "#000",
+          color: "#f66",
           background: "#f4f4f4",
         },
       },
@@ -71,16 +82,79 @@ export default class Modal {
     size: "md",
   };
 
+  public modalActions() {
+    const { configOptions } = this;
+    const modal = document.getElementById(configOptions.id)!;
+    if (configOptions.modalBody.istabs) {
+      const { active, inactive } = configOptions.modalBody!.tabsStyles!;
+      const tabButtons = modal.querySelectorAll(".modal--tabs__button");
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+          tabButtons.forEach((button) => {
+            const btn = button as HTMLElement;
+            btn.classList.remove("active");
+            btn.style.color = inactive!.color!;
+            btn.style.background = inactive!.background!;
+          });
+          const target = e.target as HTMLElement;
+          target.classList.add("active");
+          target.style.color = active!.color!;
+          target.style.background = active!.background!;
+        });
+      });
+    } else {
+      return;
+    }
+  }
+
+  static openModal(id: string) {
+    const modalOverlay = document.getElementById(id)!;
+    modalOverlay.style.display = "flex";
+  }
+
+  private elementGenerator(content: ElementType) {
+    const element = elementStyler(content!.tag)(content!.elementStyles!);
+    element.innerText = `${content.value}`;
+    if (content.type) element.setAttribute("type", content.type);
+    if (content.placeholder)
+      element.setAttribute("placeholder", content.placeholder);
+    if (content.classes) element.className = content.classes.join(" ");
+    if (content.id) element.id = content.id;
+    return element;
+  }
+
+  private buttonGenerator(buttonOptions: ButtonOptionsType) {
+    const buttonElement = new Button(buttonOptions);
+    return buttonElement.render();
+  }
+
   private generateModalOverlay() {
+    const { configOptions } = this;
+    const { escClose, backdropClose } = configOptions;
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
-    overlay.id = "modal_overlay";
+    overlay.id = configOptions.id;
+    if (escClose) {
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          overlay.style.display = "none";
+        }
+      });
+    }
+    if (backdropClose) {
+      document.addEventListener("click", function (event) {
+        if (event.target === overlay) {
+          overlay.style.display = "none";
+        }
+      });
+    }
     return overlay;
   }
 
   private generateModal() {
     const { configOptions } = this;
-    let modal;
+    const { size, selectors } = configOptions;
+    let modal: HTMLElement;
     if (configOptions.isFormModal) {
       modal = document.createElement("form");
       modal.id = "modalForm";
@@ -88,30 +162,84 @@ export default class Modal {
       modal = document.createElement("div");
     }
     modal.className = "modal";
+    if (size) {
+      modal.classList.add(size);
+    } else {
+      modal.classList.add("sm");
+    }
+    if (selectors) {
+      if (selectors.classes) {
+        selectors.classes.forEach((cls) => {
+          modal.classList.add(cls);
+        });
+      }
+    }
+    modal.id = modal.id + " " + configOptions.id;
+
     return modal;
   }
 
   private generateModalHeader() {
-    const { configOptions } = this;
+    const { configOptions, elementGenerator } = this;
     const wrapper = document.createElement("div");
     wrapper.classList.add("modal--header");
     let titleElement;
     if (configOptions.modalHeader && !Is.empty(configOptions.modalHeader)) {
-      const { title } = configOptions.modalHeader;
+      const { title, closeButton } = configOptions.modalHeader;
       if (title && typeof title === "string") {
         titleElement = document.createElement("h2");
         titleElement.classList.add("modal--header__title");
         titleElement.innerText = title;
       } else {
-        if (title!.elementStyles)
-          titleElement = elementStyler(title!.tag)(title!.elementStyles);
-        else titleElement = document.createElement(title!.tag);
-        if (title!.classes) titleElement.className = title!.classes.join(" ");
-        if (title!.id) titleElement.id = title!.id;
-        if (title!.type) titleElement.setAttribute("type", title!.type);
-        if (title!.name) titleElement.setAttribute("name", title!.name);
+        titleElement = elementGenerator(title as ElementType);
+        titleElement.style.flex = "1";
+      }
+      if (closeButton) {
+        const Button = document.createElement("button");
+        const image = document.createElement("img");
+        image.setAttribute("src", closeIcon);
+        Button.classList.add("modal--header__close__button");
+        Button.id = "closeModal";
+        Button.addEventListener("click", () => {
+          const Modal = document.getElementById(configOptions.id)!;
+          Modal.style.display = "none";
+        });
+        Button.appendChild(image);
+        wrapper.appendChild(Button);
       }
       wrapper.appendChild(titleElement);
+    }
+    return wrapper;
+  }
+
+  private generateModalFooter() {
+    const { configOptions, elementGenerator, buttonGenerator } = this;
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("modal--footer");
+    let contentElement;
+    const buttonGroup = document.createElement("div");
+    buttonGroup.classList.add("modal--footer__button__groups");
+
+    let buttonElements: HTMLElement[] = [];
+    if (configOptions.modalFooter && !Is.empty(configOptions.modalFooter)) {
+      const { content, buttons } = configOptions.modalFooter;
+      if (content && !Is.empty(content)) {
+        contentElement = elementGenerator(content);
+      }
+      if (buttons && buttons.length) {
+        buttons.forEach((btn) => {
+          const buttonElement = buttonGenerator(btn);
+          buttonElements.push(buttonElement);
+        });
+      }
+    }
+    if (contentElement) wrapper.appendChild(contentElement);
+
+    if (buttonElements) {
+      buttonElements.forEach((btn) => {
+        buttonGroup.appendChild(btn);
+      });
+      wrapper.appendChild(buttonGroup);
     }
     return wrapper;
   }
@@ -138,6 +266,22 @@ export default class Modal {
         tabButton.setAttribute("type", "button");
         tabButton.innerText = tab;
         tabButton.classList.add("modal--tabs__button");
+        // toggle tabs event
+        tabButton.addEventListener("click", () => {
+          const panels = Array.from(
+            document.getElementsByClassName(
+              "modal--tab"
+            ) as HTMLCollectionOf<HTMLElement>
+          );
+          panels.forEach((panel) => {
+            if (panel.getAttribute("data-tab") === tabButton.dataset.tab) {
+              console.log(panel);
+              panel.style.display = "block";
+            } else {
+              panel.style.display = "none";
+            }
+          });
+        });
         wrapper.appendChild(tabButton);
       });
     }
@@ -160,6 +304,11 @@ export default class Modal {
         if (element.id) panel.id = element.id;
         panel.classList.add("modal--tab");
         if (element.type) panel.setAttribute("type", element.type);
+        if (!element.type || element.type !== "input") {
+          panel.innerText = `${element.value}`;
+        }
+        if (element.placeholder)
+          panel.setAttribute("placeholder", element.placeholder);
         panel.setAttribute("data-tab", tab.header);
         panels.push(panel);
       });
@@ -184,92 +333,53 @@ export default class Modal {
     return elements;
   }
 
-  private generateFooter() {}
-
-  // old code
-
-  private generateModalTabsHeader() {
-    const tabsWrapper = document.createElement("div");
-    tabsWrapper.className = "modal--tabs";
-    return tabsWrapper;
-  }
-
-  private generateModalTabsButtons(array: string[]) {
-    let tabsButtons: any[] = [];
-    array.map((content, index) => {
-      const tabButton = document.createElement("button");
-      tabButton.className = "modal--tabs__button";
-      tabButton.setAttribute("data-tabButton", `${index + 1}`);
-      tabButton.setAttribute("type", "button");
-      tabButton.innerText = content;
-      if (index === 0) {
-        tabButton.classList.add("active");
-      }
-      tabsButtons.push(tabButton);
-    });
-    return tabsButtons;
-  }
-
-  private generateModalTabs(array: any[]) {
-    let tabs: any[] = [];
-    Array.from({ length: array.length }, (_, index) => {
-      const tab = document.createElement("div");
-      tab.className = "modal--tab";
-      tab.setAttribute("data-tab", `${index + 1}`);
-      if (index > 0) {
-        tab.style.display = "none";
-      } else {
-        tab.style.display = "block";
-      }
-      tabs.push(tab);
-    });
-    return tabs;
-  }
-
-  private generateTabInput(name: string, type: string, placeholder: string) {
-    const input = document.createElement("input");
-    input.setAttribute("type", type);
-    input.setAttribute("name", name);
-    input.setAttribute("placeholder", placeholder);
-    input.className = "modal--tab__input";
-    return input;
-  }
-
-  private generateButton() {
-    const button = document.createElement("button");
-    button.className = "notify--button";
-    button.id = "notify_utton";
-    button.innerText = "notify me";
-    return button;
-  }
-
   render() {
+    const { configOptions, generateSingleContent } = this;
     const Modal = this.generateModal();
-    // generate tabs
-    const Tabs = this.generateModalTabs(["Email", "SMS"]);
-    Tabs[0].appendChild(
-      this.generateTabInput("email", "email", "Email address")
-    );
-    Tabs[0].querySelector(".modal--tab__input").classList.add("active--input");
-    Tabs[1].appendChild(this.generateTabInput("sms", "text", "phone number"));
-    // generate tab header
-    const tabsHeader = this.generateModalTabsHeader();
-    const tabButtons = this.generateModalTabsButtons(["Email", "SMS"]);
-    tabButtons.forEach((tabButton) => {
-      tabsHeader.appendChild(tabButton);
-    });
-    // title
+    const ModalHeader = configOptions.modalHeader
+      ? this.generateModalHeader()
+      : null;
+    const ModalFooter = configOptions.modalFooter
+      ? this.generateModalFooter()
+      : null;
+    let ModalBody: HTMLElement;
+    if (configOptions.modalBody.istabs) {
+      const { active, inactive } = configOptions.modalBody!.tabsStyles!;
+      const headers = this.generateTabsHeaders(
+        configOptions.modalBody.tabs.map((tab) => tab.header),
+        configOptions.modalBody.tabsStyles!
+      );
+      headers.querySelectorAll(".modal--tabs__button").forEach((element) => {
+        const header = element as HTMLElement;
+        header.style.color = inactive.color!;
+        header.style.background = inactive.background!;
+      });
+      const tabs = configOptions.modalBody.tabs;
+      let panels = this.generateTabsPanels(tabs);
+      const firstHeader = headers.querySelector(
+        ".modal--tabs__button"
+      )! as HTMLElement;
+      firstHeader.style.color = active.color!;
+      firstHeader.style.background = active.background!;
+      ModalBody = this.generateModalBody(panels);
+      ModalBody.appendChild(headers);
+      panels.forEach((p, index) => {
+        if (index === 0) {
+          p!.style.display = "block";
+        } else {
+          p!.style.display = "none";
+        }
+        ModalBody.appendChild(p);
+      });
+    } else {
+      const Content = configOptions.modalBody as ContentType;
+      const elements = generateSingleContent(Content.element);
+      ModalBody = this.generateModalBody(elements);
+    }
     const Overlay = this.generateModalOverlay();
-    // if (this.configOptions.title) {
-    //   const Title = this.generateModalTitle(this.configOptions.title);
-    //   Modal.appendChild(Title);
-    // }
-    const SubmitButton = this.generateButton();
-    Modal.appendChild(tabsHeader);
-    Tabs.forEach((Tab) => {
-      Modal.appendChild(Tab);
-    });
-    Modal.appendChild(SubmitButton);
+    if (ModalHeader) Modal.appendChild(ModalHeader);
+    if (ModalBody) Modal.appendChild(ModalBody);
+    if (ModalFooter) Modal.appendChild(ModalFooter);
     Overlay.appendChild(Modal);
     return Overlay;
   }

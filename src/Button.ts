@@ -38,7 +38,10 @@ export default class Button {
   }
 
   public render() {
+    const { configOptions } = this;
+    const { onClick } = configOptions;
     const Button = this.generateButton();
+    if (onClick) Button.addEventListener("click", (event) => onClick(event));
     return Button;
   }
 }

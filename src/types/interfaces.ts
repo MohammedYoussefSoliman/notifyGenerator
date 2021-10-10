@@ -7,19 +7,21 @@ export interface ButtonOptionsType {
     classes?: string[];
     id?: string;
   };
+  onClick?: (event: MouseEvent) => void;
 }
 
 export type ElementType = {
   value: string | number;
-  name?: string;
   tag: string;
   elementStyles?: Partial<CSSStyleDeclaration>;
+  name?: string;
   type?: string;
+  placeholder?: string;
   classes?: string[];
   id?: string;
 };
 
-type ContentType = {
+export type ContentType = {
   istabs: false;
   element: ElementType[];
 };
@@ -28,7 +30,7 @@ type TabsConfigs = {
   istabs: true;
   tabs: {
     header: string;
-    panel?: ElementType[] | ElementType;
+    panelElements: ElementType[];
   }[];
   tabsStyles?: {
     active: Partial<CSSStyleDeclaration>;
@@ -38,27 +40,26 @@ type TabsConfigs = {
 
 type ModalHeader = {
   title?: ElementType;
-  closelButton?: ButtonOptionsType;
+  closeButton?: boolean;
   titleStyles?: Partial<CSSStyleDeclaration>;
-  withClose?: boolean;
 };
 
 type ModalFooter = {
   content?: ElementType;
-  withClose?: boolean;
-  closelButton?: ButtonOptionsType;
-  button?: ButtonOptionsType;
+  buttons?: ButtonOptionsType[];
   styles?: Partial<CSSStyleDeclaration>;
 };
 
 export interface ModalOptionsType {
+  id: string;
+  escClose?: boolean;
+  backdropClose?: boolean;
   modalHeader?: ModalHeader;
-  modalBody?: TabsConfigs | ContentType;
+  modalBody: TabsConfigs | ContentType;
   modalFooter?: ModalFooter;
   isFormModal?: boolean;
   size?: "sm" | "md" | "lg";
   selectors?: {
     classes?: string[];
-    id?: string;
   };
 }
