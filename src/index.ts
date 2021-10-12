@@ -24,6 +24,93 @@ const button = new Button({
   },
 });
 
+const secondButton = new Button({
+  text: "open modal two",
+  styles: {
+    height: "60px",
+    background: "#056",
+    borderRadius: "5px",
+    border: "none",
+    outline: "none",
+    cursor: "pointer",
+    width: "fit-content",
+  },
+  selectors: {
+    id: "open_modal_second",
+  },
+  onClick: (e) => {
+    e.preventDefault();
+    Modal.openModal("second_modal");
+  },
+});
+
+const modelTwo = new Modal({
+  id: "second_modal",
+  escClose: false,
+  backdropClose: false,
+  modalHeader: {
+    closeButton: false,
+    title: {
+      value: "second modal title",
+      tag: "h2",
+      elementStyles: {
+        textAlign: "center",
+      },
+    },
+  },
+  modalBody: {
+    istabs: false,
+    element: [
+      {
+        value: "body content",
+        tag: "div",
+      },
+    ],
+  },
+  modalFooter: {
+    buttons: [
+      {
+        text: "submit",
+        styles: {
+          height: "60px",
+          background: "#096",
+          color: "#fff",
+          borderRadius: "5px",
+          border: "none",
+          outline: "none",
+          cursor: "pointer",
+        },
+        selectors: {
+          id: "close_second_modal",
+        },
+        onClick: (e) => {
+          e.preventDefault();
+          console.log("modal submitted");
+        },
+      },
+      {
+        text: "cancel",
+        styles: {
+          height: "60px",
+          background: "#000",
+          color: "#fff",
+          borderRadius: "5px",
+          border: "none",
+          outline: "none",
+          cursor: "pointer",
+        },
+        selectors: {
+          id: "close_second_modal",
+        },
+        onClick: (e) => {
+          e.preventDefault();
+          Modal.closeModal("second_modal");
+        },
+      },
+    ],
+  },
+});
+
 const modal = new Modal({
   id: "first_modal",
   escClose: true,
@@ -137,5 +224,8 @@ const modal = new Modal({
   size: "sm",
 });
 app.appendChild(button.render());
+app.appendChild(secondButton.render());
 app.appendChild(modal.render());
+app.appendChild(modelTwo.render());
+modelTwo.modalActions();
 modal.modalActions();

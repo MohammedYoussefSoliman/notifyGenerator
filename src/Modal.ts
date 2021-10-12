@@ -111,6 +111,10 @@ export default class Modal {
     const modalOverlay = document.getElementById(id)!;
     modalOverlay.style.display = "flex";
   }
+  static closeModal(id: string) {
+    const modalOverlay = document.getElementById(id)!;
+    modalOverlay.style.display = "none";
+  }
 
   private elementGenerator(content: ElementType) {
     const element = elementStyler(content!.tag)(content!.elementStyles!);
